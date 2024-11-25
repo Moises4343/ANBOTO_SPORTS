@@ -1,8 +1,8 @@
 import express, { Application } from "express";
 import morgan from "morgan";
 import "reflect-metadata";
-import { AppDataSource } from "./paymentManagment/infrastructure/database/data-source";
-import { paymentRouter } from "./paymentManagment/infrastructure/routes/paymentRoutes";
+import { AppDataSource } from "./paymentManagement/infrastructure/database/data-source";
+import { paymentRouter } from "./paymentManagement/infrastructure/routes/paymentRoutes";
 
 const app: Application = express();
 
