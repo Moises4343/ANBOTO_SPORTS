@@ -1,5 +1,5 @@
-import { CreateOrderData } from "../domain/entities/CreateOrderData";
-import { PaymentOrder } from "../domain/entities/PaymentOrder";
+import { CreateOrderData } from "../domain/entities/createOrderData";
+import { PaymentOrder } from "../domain/entities/paymentOrder";
 import { PaymentsGateway } from "../domain/ports/paymentGateway";
 import { PaymentRepository } from "../domain/ports/paymentRepository";
 import { Validator } from "../domain/validator/validator";
