@@ -1,7 +1,7 @@
 import axios, { AxiosError } from "axios";
-import { CapturedPayment } from "../../domain/entities/CapturedPayment";
-import { CreateOrderData } from "../../domain/entities/CreateOrderData";
-import { PaymentOrder } from "../../domain/entities/PaymentOrder";
+import { CapturedPayment } from "../../domain/entities/capturedPayment";
+import { CreateOrderData } from "../../domain/entities/createOrderData";
+import { PaymentOrder } from "../../domain/entities/paymentOrder";
 import { PaymentsGateway } from "../../domain/ports/paymentGateway";
 import { HttpError } from "../errors/error";
 
