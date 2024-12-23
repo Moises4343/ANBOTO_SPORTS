@@ -1,10 +1,10 @@
 import bcrypt from "bcrypt";
+import { SenderService } from "../../application/senderService";
 import { Player } from "../../domain/entities/Player";
 import { PlayerRepository } from "../../domain/ports/playerRepository";
 import { PlayerModel } from "../database/models/PlayerModel";
-import { CustomError } from "../error/error";
-import { SenderService } from "../../application/senderService";
 import { Team, TeamModel } from "../database/models/TeamModel";
+import { CustomError } from "../error/error";
 
 export class PlayerRepositoryImpl implements PlayerRepository {
     constructor(readonly sender: SenderService){}
@@ -213,4 +213,11 @@ export class PlayerRepositoryImpl implements PlayerRepository {
             await TeamModel.deleteOne({ uuid: teamUUID });
         }
     }
+
+    //Obtener un jugador por uuid
+    async getByUUID(uuid: string): Promise<Player | null> {
+        const player = await PlayerModel.findOne({ uuid }).exec();
+        return player; 
+    }
+      
 }

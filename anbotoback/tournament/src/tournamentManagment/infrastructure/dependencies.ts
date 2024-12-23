@@ -1,52 +1,64 @@
-import { connectRabbit } from "./rabbitmq/rabbit";
-import { RabbitMQService } from "./rabbitmq/senderService";
-import { SenderService } from "../application/senderService";
-import { PlayerRepository } from "../domain/ports/playerRepository";
-import { PlayerRepositoryImpl } from "./repositories/playerRepositoryImpl";
-import { CreatePlayerUseCase } from "../application/createPlayerUseCase";
-import { CreatePlayerController } from "./controllers/createPlayerController";
-import { ResendEmailCodeUseCase } from "../application/resendEmailCodeUseCase";
-import { ResendEmailCodeController } from "./controllers/resendEmailCodeController";
-import { ValidateCodeUseCase } from "../application/validateCodeUseCase";
-import { ValidateCodeController } from "./controllers/validateCodeController";
-import { LoginPlayerUseCase } from "../application/loginPlayerUseCase";
-import { TokenService } from "../application/tokenService";
-import { JWTTokenService } from "./token/JWTTokenService";
-import { LoginPlayerController } from "./controllers/loginPlayerController";
-import { GetPlayersUseCase } from "../application/getPlayersUseCase";
-import { GetPlayersController } from "./controllers/getPlayersController";
-import { TeamRepository } from "../domain/ports/teamRepository";
-import { TeamRepositoryImpl } from "./repositories/teamRepositoryImpl";
-import { CreateTeamUseCase } from "../application/createTeamUseCase";
-import { CreateTeamController } from "./controllers/createTeamController";
-import { InviteJoinTeamUseCase } from "../application/inviteJoinTeamUseCase";
-import { InviteJointTeamController } from "./controllers/inviteJoinTeamController";
 import { AcceptInvitationUseCase } from "../application/accepteInvitationUseCase";
-import { AcceptInvitationController } from "./controllers/acceptInvitationController";
-import { DeletePlayerTeamUseCase } from "../application/deletePlayerTeamUseCase";
-import { DeletePlayerTeamController } from "./controllers/deletePlayerTeamController";
-import { GetMembersByTeamUseCase } from "../application/getMemberByTeamUseCase";
-import { GetMembersByTeamController } from "./controllers/getMembersByTeamController";
-import { TournamentRepository } from "../domain/ports/tournamentRepository";
-import { TournamentRepositoryImpl } from "./repositories/tournamentRepositoryImpl";
-import { CreateTournamentUseCase } from "../application/createTournamentUseCase";
-import { CreateTournamentController } from "./controllers/createTournamentController";
-import { GetTournamentsUseCase } from "../application/getTournamentsUseCase";
-import { GetTournamentsController } from "./controllers/getTournamentsController";
-import { CancelTournamentUseCase } from "../application/cancelTournamentUseCase";
-import { CancelTournamentController } from "./controllers/cancelTournamentController";
-import { RegisterTeamTournamentUseCase } from "../application/registerTeamTournamentUseCase";
-import { RegisterTeamTournamentController } from "./controllers/registerTeamTournamentController";
-import { GetDetailsTournamentUseCase } from "../application/getDetailsTournamentUseCase";
-import { GetDetailsTournamentController } from "./controllers/getDetailsTournamentController";
 import { AdvanceRoundUseCase } from "../application/advancedRoundUseCase";
+import { CancelTournamentUseCase } from "../application/cancelTournamentUseCase";
+import { ChatUseCases } from "../application/chatUseCases";
+import { CreatePlayerUseCase } from "../application/createPlayerUseCase";
+import { CreatePostUseCase } from "../application/createPostUseCase";
+import { CreateTeamUseCase } from "../application/createTeamUseCase";
+import { CreateTournamentUseCase } from "../application/createTournamentUseCase";
+import { DeletePlayerTeamUseCase } from "../application/deletePlayerTeamUseCase";
+import { DeletePostUseCase } from "../application/deletePostUseCase";
 import { FinalizeTournamentUseCase } from "../application/finalizeTournamentUseCase";
 import { GenerateMatchesUseCase } from "../application/generedMatchesUseCase";
+import { GetAllPostsUseCase } from "../application/getAllPostsUseCase";
+import { GetChatsByUserIdUseCase } from "../application/getChatsByUserIdUseCase";
+import { GetDetailsTournamentUseCase } from "../application/getDetailsTournamentUseCase";
+import { GetMembersByTeamUseCase } from "../application/getMemberByTeamUseCase";
+import { GetPlayerByUUIDUseCase } from "../application/getPlayerByUUIDUseCase";
+import { GetPlayersUseCase } from "../application/getPlayersUseCase";
+import { GetTournamentsUseCase } from "../application/getTournamentsUseCase";
+import { GetUserPostsUseCase } from "../application/getUserPostsUseCase";
+import { InviteJoinTeamUseCase } from "../application/inviteJoinTeamUseCase";
+import { LoginPlayerUseCase } from "../application/loginPlayerUseCase";
 import { RegisterMatchResultsUseCase } from "../application/registerMatchUseCase";
-import { GenerateMatchesController } from "./controllers/generatedMatchesController";
-import { RegisterMatchResultsController } from "./controllers/registerMatchController";
+import { RegisterTeamTournamentUseCase } from "../application/registerTeamTournamentUseCase";
+import { ResendEmailCodeUseCase } from "../application/resendEmailCodeUseCase";
+import { SenderService } from "../application/senderService";
+import { TokenService } from "../application/tokenService";
+import { ValidateCodeUseCase } from "../application/validateCodeUseCase";
+import { PlayerRepository } from "../domain/ports/playerRepository";
+import { TeamRepository } from "../domain/ports/teamRepository";
+import { TournamentRepository } from "../domain/ports/tournamentRepository";
+import { AcceptInvitationController } from "./controllers/acceptInvitationController";
 import { AdvanceRoundController } from "./controllers/advancedRoundController";
+import { CancelTournamentController } from "./controllers/cancelTournamentController";
+import { ChatController } from "./controllers/ChatController";
+import { CreatePlayerController } from "./controllers/createPlayerController";
+import { CreateTeamController } from "./controllers/createTeamController";
+import { CreateTournamentController } from "./controllers/createTournamentController";
+import { DeletePlayerTeamController } from "./controllers/deletePlayerTeamController";
 import { FinalizeTournamentController } from "./controllers/finalizeTournamentController";
+import { GenerateMatchesController } from "./controllers/generatedMatchesController";
+import { GetDetailsTournamentController } from "./controllers/getDetailsTournamentController";
+import { GetMembersByTeamController } from "./controllers/getMembersByTeamController";
+import { GetPlayerByUUIDController } from "./controllers/getPlayerByUUIDController";
+import { GetPlayersController } from "./controllers/getPlayersController";
+import { GetTournamentsController } from "./controllers/getTournamentsController";
+import { InviteJointTeamController } from "./controllers/inviteJoinTeamController";
+import { LoginPlayerController } from "./controllers/loginPlayerController";
+import { PostController } from "./controllers/PostController";
+import { RegisterMatchResultsController } from "./controllers/registerMatchController";
+import { RegisterTeamTournamentController } from "./controllers/registerTeamTournamentController";
+import { ResendEmailCodeController } from "./controllers/resendEmailCodeController";
+import { ValidateCodeController } from "./controllers/validateCodeController";
+import { connectRabbit } from "./rabbitmq/rabbit";
+import { RabbitMQService } from "./rabbitmq/senderService";
+import { FirestoreChatRepository } from "./repositories/firestoreChatRepository";
+import { PlayerRepositoryImpl } from "./repositories/playerRepositoryImpl";
+import { PostRepositoryImpl } from "./repositories/PostRepositoryImpl";
+import { TeamRepositoryImpl } from "./repositories/teamRepositoryImpl";
+import { TournamentRepositoryImpl } from "./repositories/tournamentRepositoryImpl";
+import { JWTTokenService } from "./token/JWTTokenService";
 
 
 export const initializeDependencies = async () => {
@@ -99,12 +111,31 @@ export const initializeDependencies = async () => {
     const advancedRoundController: AdvanceRoundController = new AdvanceRoundController(advanceRoundUseCase, tokenService);
     const finalizeTournamentController: FinalizeTournamentController = new FinalizeTournamentController(finalizeTournamentUseCase, tokenService);
 
+    const chatRepository = new FirestoreChatRepository();
+    const chatUseCases = new ChatUseCases(chatRepository);
+    const getChatsByUserIdUseCase = new GetChatsByUserIdUseCase(chatRepository);
+    const chatController = new ChatController(chatUseCases, getChatsByUserIdUseCase, tokenService);
+    
+
+    const getPlayerByUUIDUseCase = new GetPlayerByUUIDUseCase(playerRepository);
+    const getPlayerByUUIDController = new GetPlayerByUUIDController(getPlayerByUUIDUseCase);
+
+    const postRepository = new PostRepositoryImpl();
+    const createPostUseCase = new CreatePostUseCase(postRepository);
+    const getAllPostsUseCase = new GetAllPostsUseCase(postRepository);
+    const getUserPostsUseCase = new GetUserPostsUseCase(postRepository);
+    const deletePostUseCase = new DeletePostUseCase(postRepository);
+
+    const postController = new PostController(createPostUseCase, getAllPostsUseCase, getUserPostsUseCase, deletePostUseCase, tokenService);
+
     return { 
         createPlayerController, resendEmailCodeController, validateCodeController, loginPlayerController, 
         getPlayersController, createTeamController, inviteJoinTeamController, acceptInvitationController,
         leaveTeamController, getMembersByTeamController, createTournamentUseCase, createTournamentController,
         getTournamentsController, cancelTournamentController, registerTeamTournamentController,
         getDetailsTournamentController, generateMatchesController, registerMatchController,
-        advancedRoundController, finalizeTournamentController
+        advancedRoundController, finalizeTournamentController,
+        chatController, getPlayerByUUIDController,
+        postController
     };
 };

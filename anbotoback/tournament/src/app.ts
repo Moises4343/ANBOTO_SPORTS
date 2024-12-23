@@ -1,10 +1,14 @@
 import express, { Application } from "express";
 import morgan from "morgan";
-import { initializeDependencies } from "./tournamentManagment/infrastructure/dependencies";
-import { playerRouter } from "./tournamentManagment/infrastructure/routes/playerRoutes";
+import path from "path";
 import { connectToDatabase } from "./tournamentManagment/infrastructure/database/database";
+import { initializeDependencies } from "./tournamentManagment/infrastructure/dependencies";
+import { chatRouter } from "./tournamentManagment/infrastructure/routes/chatRoutes";
+import { playerRouter } from "./tournamentManagment/infrastructure/routes/playerRoutes";
+import { postRouter } from "./tournamentManagment/infrastructure/routes/postRoutes";
 import { teamRouter } from "./tournamentManagment/infrastructure/routes/teamRoutes";
 import { tournamentRouter } from "./tournamentManagment/infrastructure/routes/tournamentRoutes";
+
 
 (async () => {
     try {
@@ -19,7 +23,7 @@ import { tournamentRouter } from "./tournamentManagment/infrastructure/routes/to
             dependencies.createPlayerController, dependencies.resendEmailCodeController, 
             dependencies.validateCodeController, dependencies.loginPlayerController,
             dependencies.getPlayersController, dependencies.acceptInvitationController,
-            dependencies.leaveTeamController
+            dependencies.leaveTeamController, dependencies.getPlayerByUUIDController
         ));
 
         app.use('/teams', teamRouter(
@@ -35,6 +39,11 @@ import { tournamentRouter } from "./tournamentManagment/infrastructure/routes/to
             dependencies.finalizeTournamentController
         ));
         
+        app.use('/chats', chatRouter(dependencies.chatController));
+
+        app.use("/posts", postRouter(dependencies.postController));
+        app.use('/images', express.static(path.join(__dirname, 'tournamentManagment/infrastructure/images')));
+
         process.loadEnvFile();
         const PORT = process.env.PORT || 3000;
 

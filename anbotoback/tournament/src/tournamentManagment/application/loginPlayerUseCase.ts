@@ -11,6 +11,7 @@ export class LoginPlayerUseCase {
         return {
             team,
             token: this.service.generateToken(data, "1d"),
+            id: data.uuid,
             mesage: 'Jugador loggeado correctamente'
         }
     }
