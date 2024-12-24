@@ -2,7 +2,15 @@ import fs from "fs";
 import mongoose, { Document, Schema } from "mongoose";
 import path from "path";
 import { Post } from "../../domain/entities/Post";
+import { PostComment } from "../../domain/entities/PostComment";
 import { PostRepository } from "../../domain/ports/PostRepository";
+
+interface IPostComment {
+  commentId: string;
+  userId: string;
+  content: string;
+  createdAt: Date;
+}
 
 interface IPost extends Document {
   postId: string;
@@ -10,7 +18,16 @@ interface IPost extends Document {
   imagePath: string;
   content: string | null;
   createdAt: Date;
+  comments: IPostComment[];
+  likes: string[];
 }
+
+const PostCommentSchema: Schema = new Schema({
+  commentId: { type: String, required: true },
+  userId: { type: String, required: true },
+  content: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now },
+});
 
 const PostSchema: Schema = new Schema({
   postId: { type: String, required: true, unique: true },
@@ -18,6 +35,8 @@ const PostSchema: Schema = new Schema({
   imagePath: { type: String, required: true },
   content: { type: String, default: null },
   createdAt: { type: Date, default: Date.now },
+  comments: [PostCommentSchema],
+  likes: [{ type: String }],
 });
 
 const PostModel = mongoose.model<IPost>("Post", PostSchema);
@@ -36,9 +55,12 @@ export class PostRepositoryImpl implements PostRepository {
       post.authorUuid,
       `${process.env.PORT || 'http://localhost:3001'}${post.imagePath}`,
       post.content,
-      post.createdAt
+      post.createdAt,
+      post.comments as PostComment[],
+      post.likes
     ));
   }
+  
 
   async getUserPosts(userUuid: string): Promise<Post[]> {
     const posts = await PostModel.find({ authorUuid: userUuid }).exec();
@@ -47,7 +69,9 @@ export class PostRepositoryImpl implements PostRepository {
       post.authorUuid,
       `${process.env.PORT || 'http://localhost:3001'}${post.imagePath}`,
       post.content,
-      post.createdAt
+      post.createdAt,
+      post.comments as PostComment[],
+      post.likes
     ));
   }
 
@@ -65,5 +89,26 @@ export class PostRepositoryImpl implements PostRepository {
 
     await PostModel.deleteOne({ postId, authorUuid });
     return true;
+  }
+
+  async addComment(postId: string, comment: PostComment): Promise<void> {
+    await PostModel.findOneAndUpdate(
+      { postId },
+      { $push: { comments: comment } }
+    );
+  }
+
+  async addLike(postId: string, userId: string): Promise<void> {
+    await PostModel.findOneAndUpdate(
+      { postId },
+      { $addToSet: { likes: userId } }
+    );
+  }
+
+  async removeLike(postId: string, userId: string): Promise<void> {
+    await PostModel.findOneAndUpdate(
+      { postId },
+      { $pull: { likes: userId } }
+    );
   }
 }

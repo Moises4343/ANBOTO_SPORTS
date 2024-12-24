@@ -10,4 +10,5 @@ export interface PlayerRepository {
     acceptInvitation(uuid: string, teamUUID: string): Promise<Team>;
     leaveTeam(uuid: string, teamUUID: string): Promise<any>;
     getByUUID(uuid: string): Promise<Player | null>;
+    getAllPlayers(): Promise<Player[]>;
 }

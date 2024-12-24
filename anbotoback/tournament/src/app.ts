@@ -23,7 +23,8 @@ import { tournamentRouter } from "./tournamentManagment/infrastructure/routes/to
             dependencies.createPlayerController, dependencies.resendEmailCodeController, 
             dependencies.validateCodeController, dependencies.loginPlayerController,
             dependencies.getPlayersController, dependencies.acceptInvitationController,
-            dependencies.leaveTeamController, dependencies.getPlayerByUUIDController
+            dependencies.leaveTeamController, dependencies.getPlayerByUUIDController,
+            dependencies.getAllPlayersController
         ));
 
         app.use('/teams', teamRouter(

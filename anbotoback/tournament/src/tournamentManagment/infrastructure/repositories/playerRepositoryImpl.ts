@@ -7,7 +7,7 @@ import { Team, TeamModel } from "../database/models/TeamModel";
 import { CustomError } from "../error/error";
 
 export class PlayerRepositoryImpl implements PlayerRepository {
-    constructor(readonly sender: SenderService){}
+    constructor(readonly sender: SenderService) { }
 
     async findByEmailOrPhone(email: string, phone: string): Promise<boolean> {
         const playerExists = await PlayerModel.exists({ $or: [{ email }, { phone }] });
@@ -16,7 +16,7 @@ export class PlayerRepositoryImpl implements PlayerRepository {
 
     async create(player: Player): Promise<any> {
         const exists: boolean = await this.findByEmailOrPhone(player.email!, player.phone!);
-        if(exists) throw new CustomError(400, "El correo electrónico o el número de teléfono ya están registrados.");
+        if (exists) throw new CustomError(400, "El correo electrónico o el número de teléfono ya están registrados.");
 
         try {
             const newPlayer = new PlayerModel({
@@ -49,11 +49,11 @@ export class PlayerRepositoryImpl implements PlayerRepository {
         if (!player) {
             throw new CustomError(404, "El jugador con el correo proporcionado no existe.");
         }
-        
+
         if (player.isActive) {
             throw new CustomError(400, "El jugador ya está activado. No se puede reenviar el código.");
         }
-        
+
         try {
             player!.optCode = code;
             player!.optExpired = new Date(Date.now() + 5 * 60 * 1000);
@@ -74,41 +74,41 @@ export class PlayerRepositoryImpl implements PlayerRepository {
         if (!player) {
             throw new CustomError(404, "El jugador con el correo proporcionado no existe.");
         }
-    
+
         if (player.isActive) {
             throw new CustomError(400, "El usuario ya está activo. No es necesario validar el código.");
         }
-    
+
         const currentTime = new Date();
         if (player.optExpired && currentTime > player.optExpired) {
             throw new CustomError(400, "El código ingresado ha expirado.");
         }
-    
+
         if (player.optCode !== code) {
             throw new CustomError(400, "El código ingresado es incorrecto.");
         }
-    
+
         player.isActive = true;
-        player.optCode = null; 
+        player.optCode = null;
         player.optExpired = null;
         await player.save();
     }
 
-    async login(email: string, password: string): Promise<{uuid: string, email: string}> {
+    async login(email: string, password: string): Promise<{ uuid: string, email: string }> {
         const player = await PlayerModel.findOne({ email });
         if (!player) {
             throw new CustomError(404, "El jugador con el correo proporcionado no existe.");
         }
-    
+
         if (!player.isActive) {
             throw new CustomError(400, "El usuario aún no ha sido activado.");
         }
-    
+
         const isPasswordValid = await bcrypt.compare(password, player.password!);
         if (!isPasswordValid) {
             throw new CustomError(401, "Credenciales incorrectas.");
         }
-    
+
         return { uuid: player.uuid, email: player.email! };
     }
 
@@ -133,8 +133,8 @@ export class PlayerRepositoryImpl implements PlayerRepository {
                 }
             ]
         });
-        
-    
+
+
         return players.map((player) => new Player({
             uuid: player.uuid,
             name: player.name,
@@ -214,10 +214,24 @@ export class PlayerRepositoryImpl implements PlayerRepository {
         }
     }
 
-    //Obtener un jugador por uuid
     async getByUUID(uuid: string): Promise<Player | null> {
         const player = await PlayerModel.findOne({ uuid }).exec();
-        return player; 
+        return player;
     }
-      
+
+    async getAllPlayers(): Promise<Player[]> {
+        const players = await PlayerModel.find().exec();
+        return players.map(player => new Player({
+            uuid: player.uuid,
+            name: player.name,
+            lastname: player.lastname,
+            email: player.email,
+            phone: player.phone,
+            birthday: player.birthday,
+            isActive: player.isActive,
+            teamUUID: player.teamUUID
+        }));
+    }
+
+
 }

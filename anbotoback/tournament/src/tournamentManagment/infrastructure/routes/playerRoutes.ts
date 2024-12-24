@@ -2,6 +2,7 @@ import { Router } from "express";
 import { AcceptInvitationController } from "../controllers/acceptInvitationController";
 import { CreatePlayerController } from "../controllers/createPlayerController";
 import { DeletePlayerTeamController } from "../controllers/deletePlayerTeamController";
+import { GetAllPlayersController } from "../controllers/getAllPlayersController";
 import { GetPlayerByUUIDController } from "../controllers/getPlayerByUUIDController";
 import { GetPlayersController } from "../controllers/getPlayersController";
 import { LoginPlayerController } from "../controllers/loginPlayerController";
@@ -17,7 +18,8 @@ export const playerRouter = (
         getPlayersController: GetPlayersController,
         acceptInvitationController: AcceptInvitationController,
         leaveTeamController: DeletePlayerTeamController,
-        getPlayerByUUIDController: GetPlayerByUUIDController
+        getPlayerByUUIDController: GetPlayerByUUIDController,
+        getAllPlayersController: GetAllPlayersController
     ): Router => {
         const router = Router();
 
@@ -29,6 +31,7 @@ export const playerRouter = (
         router.post('/accept-invitation', acceptInvitationController.execute.bind(acceptInvitationController));
         router.delete('/leave/:teamUUID', leaveTeamController.execute.bind(leaveTeamController));
         router.get("/uuid/:uuid", getPlayerByUUIDController.execute.bind(getPlayerByUUIDController));
+        router.get("/all-players", getAllPlayersController.execute.bind(getAllPlayersController));
 
         return router;
 };

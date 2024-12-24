@@ -1,4 +1,6 @@
 import { AcceptInvitationUseCase } from "../application/accepteInvitationUseCase";
+import { AddCommentUseCase } from "../application/addCommentUseCase";
+import { AddLikeUseCase } from "../application/addLikeUseCase";
 import { AdvanceRoundUseCase } from "../application/advancedRoundUseCase";
 import { CancelTournamentUseCase } from "../application/cancelTournamentUseCase";
 import { ChatUseCases } from "../application/chatUseCases";
@@ -10,6 +12,7 @@ import { DeletePlayerTeamUseCase } from "../application/deletePlayerTeamUseCase"
 import { DeletePostUseCase } from "../application/deletePostUseCase";
 import { FinalizeTournamentUseCase } from "../application/finalizeTournamentUseCase";
 import { GenerateMatchesUseCase } from "../application/generedMatchesUseCase";
+import { GetAllPlayersUseCase } from "../application/getAllPlayersUseCase";
 import { GetAllPostsUseCase } from "../application/getAllPostsUseCase";
 import { GetChatsByUserIdUseCase } from "../application/getChatsByUserIdUseCase";
 import { GetDetailsTournamentUseCase } from "../application/getDetailsTournamentUseCase";
@@ -22,6 +25,7 @@ import { InviteJoinTeamUseCase } from "../application/inviteJoinTeamUseCase";
 import { LoginPlayerUseCase } from "../application/loginPlayerUseCase";
 import { RegisterMatchResultsUseCase } from "../application/registerMatchUseCase";
 import { RegisterTeamTournamentUseCase } from "../application/registerTeamTournamentUseCase";
+import { RemoveLikeUseCase } from "../application/removeLikeUseCase";
 import { ResendEmailCodeUseCase } from "../application/resendEmailCodeUseCase";
 import { SenderService } from "../application/senderService";
 import { TokenService } from "../application/tokenService";
@@ -39,6 +43,7 @@ import { CreateTournamentController } from "./controllers/createTournamentContro
 import { DeletePlayerTeamController } from "./controllers/deletePlayerTeamController";
 import { FinalizeTournamentController } from "./controllers/finalizeTournamentController";
 import { GenerateMatchesController } from "./controllers/generatedMatchesController";
+import { GetAllPlayersController } from "./controllers/getAllPlayersController";
 import { GetDetailsTournamentController } from "./controllers/getDetailsTournamentController";
 import { GetMembersByTeamController } from "./controllers/getMembersByTeamController";
 import { GetPlayerByUUIDController } from "./controllers/getPlayerByUUIDController";
@@ -59,7 +64,6 @@ import { PostRepositoryImpl } from "./repositories/PostRepositoryImpl";
 import { TeamRepositoryImpl } from "./repositories/teamRepositoryImpl";
 import { TournamentRepositoryImpl } from "./repositories/tournamentRepositoryImpl";
 import { JWTTokenService } from "./token/JWTTokenService";
-
 
 export const initializeDependencies = async () => {
     const rabbitConnection = await connectRabbit();
@@ -110,6 +114,8 @@ export const initializeDependencies = async () => {
     const registerMatchController: RegisterMatchResultsController = new RegisterMatchResultsController(registerMatchResultsUseCase, tokenService);
     const advancedRoundController: AdvanceRoundController = new AdvanceRoundController(advanceRoundUseCase, tokenService);
     const finalizeTournamentController: FinalizeTournamentController = new FinalizeTournamentController(finalizeTournamentUseCase, tokenService);
+    const getAllPlayersUseCase = new GetAllPlayersUseCase(playerRepository);
+    const getAllPlayersController = new GetAllPlayersController(getAllPlayersUseCase);
 
     const chatRepository = new FirestoreChatRepository();
     const chatUseCases = new ChatUseCases(chatRepository);
@@ -125,8 +131,11 @@ export const initializeDependencies = async () => {
     const getAllPostsUseCase = new GetAllPostsUseCase(postRepository);
     const getUserPostsUseCase = new GetUserPostsUseCase(postRepository);
     const deletePostUseCase = new DeletePostUseCase(postRepository);
+    const addCommentUseCase = new AddCommentUseCase(postRepository);
+    const addLikeUseCase = new AddLikeUseCase(postRepository);
+    const removeLikeUseCase = new RemoveLikeUseCase(postRepository);
 
-    const postController = new PostController(createPostUseCase, getAllPostsUseCase, getUserPostsUseCase, deletePostUseCase, tokenService);
+    const postController = new PostController(createPostUseCase, getAllPostsUseCase, getUserPostsUseCase, deletePostUseCase, addCommentUseCase, addLikeUseCase, removeLikeUseCase, tokenService);
 
     return { 
         createPlayerController, resendEmailCodeController, validateCodeController, loginPlayerController, 
@@ -136,6 +145,6 @@ export const initializeDependencies = async () => {
         getDetailsTournamentController, generateMatchesController, registerMatchController,
         advancedRoundController, finalizeTournamentController,
         chatController, getPlayerByUUIDController,
-        postController
+        postController, getAllPlayersController
     };
 };

@@ -8,6 +8,9 @@ export const postRouter = (postController: PostController): Router => {
   router.get("/all-posts", postController.getAllPosts.bind(postController));
   router.get("/get-post", (req, res) => postController.getUserPosts(req, res));
   router.delete("/delete-post/:postId", postController.deletePost.bind(postController));
+  router.post("/:postId/add-comment", postController.addComment.bind(postController));
+  router.post("/:postId/add-like", postController.addLike.bind(postController));
+  router.post("/:postId/remove-like", postController.removeLike.bind(postController));
 
   return router;
 };

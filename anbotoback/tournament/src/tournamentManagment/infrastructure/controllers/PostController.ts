@@ -1,10 +1,13 @@
 import { Request, Response } from "express";
 import multer from "multer";
 import path from "path";
+import { AddCommentUseCase } from "../../application/addCommentUseCase";
+import { AddLikeUseCase } from "../../application/addLikeUseCase";
 import { CreatePostUseCase } from "../../application/createPostUseCase";
 import { DeletePostUseCase } from "../../application/deletePostUseCase";
 import { GetAllPostsUseCase } from "../../application/getAllPostsUseCase";
 import { GetUserPostsUseCase } from "../../application/getUserPostsUseCase";
+import { RemoveLikeUseCase } from "../../application/removeLikeUseCase";
 import { TokenService } from "../../application/tokenService";
 import { CustomError } from "../error/error";
 
@@ -26,6 +29,9 @@ export class PostController {
     private getAllPostsUseCase: GetAllPostsUseCase,
     private getUserPostsUseCase: GetUserPostsUseCase,
     private deletePostUseCase: DeletePostUseCase,
+    private addCommentUseCase: AddCommentUseCase,
+    private addLikeUseCase: AddLikeUseCase,
+    private removeLikeUseCase: RemoveLikeUseCase,
     private tokenService: TokenService
   ) {}
 
@@ -113,5 +119,78 @@ export class PostController {
       res.status(error.statusCode || 500).json({ error: error.message });
     }
   }
+
+  async addComment(req: Request, res: Response): Promise<void> {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        throw new CustomError(401, "Token no proporcionado o inválido.");
+      }
+
+      const token = authHeader.split(" ")[1];
+      const { uuid } = this.tokenService.getTokenData<{ uuid: string }>(token);
+
+      const { postId } = req.params;
+      const { content } = req.body;
+
+      if (!content) {
+        throw new CustomError(400, "El comentario no puede estar vacío.");
+      }
+
+      await this.addCommentUseCase.execute(postId, uuid, content);
+
+      res.status(201).json({ message: "Comentario agregado correctamente." });
+    } catch (error: any) {
+      console.error("Error al agregar comentario:", error);
+      res.status(error.statusCode || 500).json({ error: error.message });
+    }
+  }
+
+  async addLike(req: Request, res: Response): Promise<void> {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        throw new CustomError(401, "Token no proporcionado o inválido.");
+      }
+  
+      const token = authHeader.split(" ")[1];
+      const { uuid } = this.tokenService.getTokenData<{ uuid: string }>(token);
+  
+      const { postId } = req.params;
+  
+      await this.addLikeUseCase.execute(postId, uuid);
+  
+      res.status(200).json({ message: "Like agregado correctamente." });
+    } catch (error: any) {
+      console.error("Error al agregar like:", error);
+      res.status(error.statusCode || 500).json({ error: error.message });
+    }
+  }
+  
+
+  async removeLike(req: Request, res: Response): Promise<void> {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        throw new CustomError(401, "Token no proporcionado o inválido.");
+      }
+  
+      const token = authHeader.split(" ")[1];
+      console.log("Token recibido:", token);
+  
+      const { uuid } = this.tokenService.getTokenData<{ uuid: string }>(token);
+      console.log("UUID del token:", uuid);
+  
+      const { postId } = req.params;
+  
+      await this.removeLikeUseCase.execute(postId, uuid);
+  
+      res.status(200).json({ message: "Like eliminado correctamente." });
+    } catch (error: any) {
+      console.error("Error al eliminar like:", error);
+      res.status(error.statusCode || 500).json({ error: error.message });
+    }
+  }
+  
   
 }
