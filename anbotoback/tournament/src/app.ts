@@ -24,7 +24,7 @@ import { tournamentRouter } from "./tournamentManagment/infrastructure/routes/to
             dependencies.validateCodeController, dependencies.loginPlayerController,
             dependencies.getPlayersController, dependencies.acceptInvitationController,
             dependencies.leaveTeamController, dependencies.getPlayerByUUIDController,
-            dependencies.getAllPlayersController
+            dependencies.getAllPlayersController, dependencies.deletePlayerController
         ));
 
         app.use('/teams', teamRouter(

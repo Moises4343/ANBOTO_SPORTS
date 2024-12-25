@@ -9,6 +9,7 @@ import { CreatePostUseCase } from "../application/createPostUseCase";
 import { CreateTeamUseCase } from "../application/createTeamUseCase";
 import { CreateTournamentUseCase } from "../application/createTournamentUseCase";
 import { DeletePlayerTeamUseCase } from "../application/deletePlayerTeamUseCase";
+import { DeletePlayerUseCase } from "../application/deletePlayerUseCase";
 import { DeletePostUseCase } from "../application/deletePostUseCase";
 import { FinalizeTournamentUseCase } from "../application/finalizeTournamentUseCase";
 import { GenerateMatchesUseCase } from "../application/generedMatchesUseCase";
@@ -40,6 +41,7 @@ import { ChatController } from "./controllers/ChatController";
 import { CreatePlayerController } from "./controllers/createPlayerController";
 import { CreateTeamController } from "./controllers/createTeamController";
 import { CreateTournamentController } from "./controllers/createTournamentController";
+import { DeletePlayerController } from "./controllers/deletePlayerController";
 import { DeletePlayerTeamController } from "./controllers/deletePlayerTeamController";
 import { FinalizeTournamentController } from "./controllers/finalizeTournamentController";
 import { GenerateMatchesController } from "./controllers/generatedMatchesController";
@@ -115,7 +117,9 @@ export const initializeDependencies = async () => {
     const advancedRoundController: AdvanceRoundController = new AdvanceRoundController(advanceRoundUseCase, tokenService);
     const finalizeTournamentController: FinalizeTournamentController = new FinalizeTournamentController(finalizeTournamentUseCase, tokenService);
     const getAllPlayersUseCase = new GetAllPlayersUseCase(playerRepository);
-    const getAllPlayersController = new GetAllPlayersController(getAllPlayersUseCase);
+    const getAllPlayersController = new GetAllPlayersController(getAllPlayersUseCase, tokenService);
+    const deletePlayerUseCase = new DeletePlayerUseCase(playerRepository);
+    const deletePlayerController = new DeletePlayerController(deletePlayerUseCase, tokenService);
 
     const chatRepository = new FirestoreChatRepository();
     const chatUseCases = new ChatUseCases(chatRepository);
@@ -145,6 +149,7 @@ export const initializeDependencies = async () => {
         getDetailsTournamentController, generateMatchesController, registerMatchController,
         advancedRoundController, finalizeTournamentController,
         chatController, getPlayerByUUIDController,
-        postController, getAllPlayersController
+        postController, getAllPlayersController, 
+        deletePlayerController
     };
 };

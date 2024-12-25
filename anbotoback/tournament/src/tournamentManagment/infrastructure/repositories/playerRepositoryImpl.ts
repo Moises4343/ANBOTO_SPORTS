@@ -233,5 +233,15 @@ export class PlayerRepositoryImpl implements PlayerRepository {
         }));
     }
 
+    async deletePlayer(uuid: string): Promise<void> {
+        const player = await PlayerModel.findOne({ uuid });
+
+        if (!player) {
+            throw new CustomError(404, "El jugador no existe.");
+        }
+
+        await PlayerModel.deleteOne({ uuid });
+    }
+
 
 }
