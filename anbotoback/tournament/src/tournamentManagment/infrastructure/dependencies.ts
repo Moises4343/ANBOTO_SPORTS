@@ -8,6 +8,7 @@ import { CreatePlayerUseCase } from "../application/createPlayerUseCase";
 import { CreatePostUseCase } from "../application/createPostUseCase";
 import { CreateTeamUseCase } from "../application/createTeamUseCase";
 import { CreateTournamentUseCase } from "../application/createTournamentUseCase";
+import { DeleteChatUseCase } from "../application/deleteChatUseCase";
 import { DeletePlayerTeamUseCase } from "../application/deletePlayerTeamUseCase";
 import { DeletePlayerUseCase } from "../application/deletePlayerUseCase";
 import { DeletePostUseCase } from "../application/deletePostUseCase";
@@ -124,7 +125,8 @@ export const initializeDependencies = async () => {
     const chatRepository = new FirestoreChatRepository();
     const chatUseCases = new ChatUseCases(chatRepository);
     const getChatsByUserIdUseCase = new GetChatsByUserIdUseCase(chatRepository);
-    const chatController = new ChatController(chatUseCases, getChatsByUserIdUseCase, tokenService);
+    const deleteChatUseCase = new DeleteChatUseCase(chatRepository);
+    const chatController = new ChatController(chatUseCases, getChatsByUserIdUseCase, deleteChatUseCase, tokenService);
     
 
     const getPlayerByUUIDUseCase = new GetPlayerByUUIDUseCase(playerRepository);

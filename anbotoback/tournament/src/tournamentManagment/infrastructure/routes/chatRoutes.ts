@@ -11,6 +11,7 @@ export const chatRouter = (
   router.post('/send-message/:chatId/messages', chatController.sendMessage.bind(chatController));
   router.get('/receive-message/:chatId/messages', chatController.listMessages.bind(chatController));
   router.get("/list-chats", chatController.getChatsByUserId.bind(chatController));
+  router.delete('/delete-chat/:chatId', chatController.deleteChat.bind(chatController));
 
   return router;
 };

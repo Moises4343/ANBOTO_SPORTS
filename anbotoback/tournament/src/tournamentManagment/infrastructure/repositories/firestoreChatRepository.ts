@@ -51,7 +51,22 @@ export class FirestoreChatRepository implements ChatRepository {
     }));
   }
   
-  
+  async deleteChatById(chatId: string, userId: string): Promise<void> {
+    const chatDoc = this.chatsCollection.doc(chatId);
+    const chatSnapshot = await chatDoc.get();
+
+    if (!chatSnapshot.exists) {
+      throw new Error("El chat no existe.");
+    }
+
+    const chatData = chatSnapshot.data();
+
+    if (!chatData?.participants.includes(userId)) {
+      throw new Error("No tienes permiso para eliminar este chat.");
+    }
+
+    await chatDoc.delete();
+  }
   
   
 }
