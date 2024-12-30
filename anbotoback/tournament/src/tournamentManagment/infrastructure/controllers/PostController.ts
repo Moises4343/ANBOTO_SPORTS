@@ -10,18 +10,45 @@ import { GetUserPostsUseCase } from "../../application/getUserPostsUseCase";
 import { RemoveLikeUseCase } from "../../application/removeLikeUseCase";
 import { TokenService } from "../../application/tokenService";
 import { CustomError } from "../error/error";
+import logger from "../logs/logger";
 
+
+/**
+ * Configuración de almacenamiento con Multer
+ */
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, path.join(__dirname, "../images/posts"));
-    },
-    filename: (req, file, cb) => {
-      cb(null, `${Date.now()}-${file.originalname}`);
-    },
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, "../images/posts"));
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
 });
-  
 
-export const upload = multer({ storage });
+
+const fileFilter = (
+  req: Request & { fileValidationError?: string }, 
+  file: Express.Multer.File, 
+  cb: multer.FileFilterCallback
+) => {
+  const allowedMimeTypes = ["image/jpeg", "image/jpg", "image/png"];
+
+  if (allowedMimeTypes.includes(file.mimetype)) {
+    cb(null, true); 
+  } else {
+    req.fileValidationError = "Solo se permiten archivos con extensión .jpg, .jpeg o .png";
+    cb(null, false); 
+  }
+};
+
+
+export const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 }, 
+});
+
+
 
 export class PostController {
   constructor(
@@ -33,9 +60,9 @@ export class PostController {
     private addLikeUseCase: AddLikeUseCase,
     private removeLikeUseCase: RemoveLikeUseCase,
     private tokenService: TokenService
-  ) {}
+  ) { }
 
-  async createPost(req: Request, res: Response): Promise<void> {
+  async createPost(req: Request & { fileValidationError?: string }, res: Response): Promise<void> {
     try {
       const authHeader = req.headers.authorization;
       if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -44,7 +71,11 @@ export class PostController {
 
       const token = authHeader.split(" ")[1];
       const { uuid } = this.tokenService.getTokenData<{ uuid: string }>(token);
-
+      
+      if (req.fileValidationError) {
+        throw new CustomError(400, req.fileValidationError);
+      }
+      
       if (!req.file) {
         throw new CustomError(400, "Imagen no proporcionada.");
       }
@@ -57,6 +88,18 @@ export class PostController {
       res.status(201).json(post);
     } catch (error: any) {
       console.error("Error al crear publicación:", error);
+      logger.error(error.message, {
+        metadata: {
+          route: req.originalUrl,
+          method: req.method,
+          params: req.params,
+          body: req.body,
+          headers: req.headers,
+          ip: req.ip,
+          userAgent: req.headers["user-agent"] || "No disponible",
+          stack: error.stack,
+        },
+      });
       res.status(error.statusCode || 500).json({ error: error.message });
     }
   }
@@ -67,15 +110,25 @@ export class PostController {
       if (!authHeader || !authHeader.startsWith("Bearer ")) {
         throw new CustomError(401, "Token no proporcionado o inválido.");
       }
-  
+
       const token = authHeader.split(" ")[1];
       const { uuid } = this.tokenService.getTokenData<{ uuid: string }>(token);
-  
+
       const posts = await this.getAllPostsUseCase.execute();
-  
+
       res.status(200).json(posts);
     } catch (error: any) {
       console.error("Error al obtener publicaciones:", error);
+      logger.error(error.message, {
+        route: req.originalUrl,
+        method: req.method,
+        params: req.params,
+        body: req.body,
+        headers: req.headers,
+        ip: req.ip,
+        userAgent: req.headers["user-agent"] || "No disponible",
+        stack: error.stack,
+      });
       res.status(error.statusCode || 500).json({ error: error.message });
     }
   }
@@ -86,19 +139,29 @@ export class PostController {
       if (!authHeader || !authHeader.startsWith("Bearer ")) {
         throw new CustomError(401, "Token no proporcionado o inválido.");
       }
-  
+
       const token = authHeader.split(" ")[1];
       const { uuid } = this.tokenService.getTokenData<{ uuid: string }>(token);
-  
+
       const posts = await this.getUserPostsUseCase.execute(uuid);
-  
+
       res.status(200).json(posts);
     } catch (error: any) {
       console.error("Error al obtener publicaciones del usuario:", error);
+      logger.error(error.message, {
+        route: req.originalUrl,
+        method: req.method,
+        params: req.params,
+        body: req.body,
+        headers: req.headers,
+        ip: req.ip,
+        userAgent: req.headers["user-agent"] || "No disponible",
+        stack: error.stack,
+      });
       res.status(error.statusCode || 500).json({ error: error.message });
     }
   }
-  
+
   async deletePost(req: Request, res: Response): Promise<void> {
     try {
       const authHeader = req.headers.authorization;
@@ -116,6 +179,16 @@ export class PostController {
       res.status(200).json({ message: "Publicación eliminada correctamente." });
     } catch (error: any) {
       console.error("Error al eliminar publicación:", error);
+      logger.error(error.message, {
+        route: req.originalUrl,
+        method: req.method,
+        params: req.params,
+        body: req.body,
+        headers: req.headers,
+        ip: req.ip,
+        userAgent: req.headers["user-agent"] || "No disponible",
+        stack: error.stack,
+      });
       res.status(error.statusCode || 500).json({ error: error.message });
     }
   }
@@ -142,6 +215,16 @@ export class PostController {
       res.status(201).json({ message: "Comentario agregado correctamente." });
     } catch (error: any) {
       console.error("Error al agregar comentario:", error);
+      logger.error(error.message, {
+        route: req.originalUrl,
+        method: req.method,
+        params: req.params,
+        body: req.body,
+        headers: req.headers,
+        ip: req.ip,
+        userAgent: req.headers["user-agent"] || "No disponible",
+        stack: error.stack,
+      });
       res.status(error.statusCode || 500).json({ error: error.message });
     }
   }
@@ -152,21 +235,31 @@ export class PostController {
       if (!authHeader || !authHeader.startsWith("Bearer ")) {
         throw new CustomError(401, "Token no proporcionado o inválido.");
       }
-  
+
       const token = authHeader.split(" ")[1];
       const { uuid } = this.tokenService.getTokenData<{ uuid: string }>(token);
-  
+
       const { postId } = req.params;
-  
+
       await this.addLikeUseCase.execute(postId, uuid);
-  
+
       res.status(200).json({ message: "Like agregado correctamente." });
     } catch (error: any) {
       console.error("Error al agregar like:", error);
+      logger.error(error.message, {
+        route: req.originalUrl,
+        method: req.method,
+        params: req.params,
+        body: req.body,
+        headers: req.headers,
+        ip: req.ip,
+        userAgent: req.headers["user-agent"] || "No disponible",
+        stack: error.stack,
+      });
       res.status(error.statusCode || 500).json({ error: error.message });
     }
   }
-  
+
 
   async removeLike(req: Request, res: Response): Promise<void> {
     try {
@@ -174,23 +267,33 @@ export class PostController {
       if (!authHeader || !authHeader.startsWith("Bearer ")) {
         throw new CustomError(401, "Token no proporcionado o inválido.");
       }
-  
+
       const token = authHeader.split(" ")[1];
       console.log("Token recibido:", token);
-  
+
       const { uuid } = this.tokenService.getTokenData<{ uuid: string }>(token);
       console.log("UUID del token:", uuid);
-  
+
       const { postId } = req.params;
-  
+
       await this.removeLikeUseCase.execute(postId, uuid);
-  
+
       res.status(200).json({ message: "Like eliminado correctamente." });
     } catch (error: any) {
       console.error("Error al eliminar like:", error);
+      logger.error(error.message, {
+        metadata: {
+          route: req.originalUrl,
+          method: req.method,
+          params: req.params,
+          body: req.body,
+          headers: req.headers,
+          ip: req.ip,
+          userAgent: req.headers["user-agent"] || "No disponible",
+          stack: error.stack,
+        },
+      });
       res.status(error.statusCode || 500).json({ error: error.message });
     }
   }
-  
-  
 }

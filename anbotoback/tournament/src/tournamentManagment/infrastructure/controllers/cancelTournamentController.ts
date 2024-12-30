@@ -1,7 +1,8 @@
 import { Request, RequestHandler, Response } from "express";
-import { CustomError } from "../error/error";
 import { CancelTournamentUseCase } from "../../application/cancelTournamentUseCase";
 import { TokenService } from "../../application/tokenService";
+import { CustomError } from "../error/error";
+import logger from "../logs/logger";
 
 export class CancelTournamentController {
     constructor(readonly useCase: CancelTournamentUseCase, readonly service: TokenService){}
@@ -19,6 +20,18 @@ export class CancelTournamentController {
             res.status(200).json({message: 'Torneo cancelado Correctamente'});
         } catch (error: any) {
             console.error("Error inesperado:", error);
+            logger.error(error.message, {
+                metadata: {
+                    route: req.originalUrl,
+                    method: req.method,
+                    params: req.params,
+                    body: req.body,
+                    headers: req.headers,
+                    ip: req.ip,
+                    userAgent: req.headers["user-agent"] || "No disponible",
+                    stack: error.stack,
+                },
+            });
             res.status(error.statusCode || 500).json({ error: error.message || "Error interno del servidor" });
         }
     }

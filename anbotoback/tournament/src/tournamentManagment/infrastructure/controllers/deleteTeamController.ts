@@ -1,11 +1,14 @@
 import { Request, RequestHandler, Response } from "express";
-import { GetPlayersUseCase } from "../../application/getPlayersUseCase";
+import { DeleteTeamUseCase } from "../../application/deleteTeamUseCase";
 import { TokenService } from "../../application/tokenService";
 import { CustomError } from "../error/error";
 import logger from "../logs/logger";
 
-export class GetPlayersController {
-    constructor(readonly useCase: GetPlayersUseCase, readonly service: TokenService) { }
+export class DeleteTeamController {
+    constructor(
+        private readonly useCase: DeleteTeamUseCase,
+        private readonly service: TokenService
+    ) {}
 
     execute: RequestHandler = async (req: Request, res: Response) => {
         try {
@@ -15,13 +18,24 @@ export class GetPlayersController {
             }
 
             const token = authHeader.split(" ")[1];
-            if (!this.service.validateToken(token)) throw new CustomError(401, "El token no es valido");
+            if (!this.service.validateToken(token)) {
+                throw new CustomError(401, "El token no es valido");
+            }
 
-            const search = req.params.search;
-            if (!search) throw new CustomError(400, "No se esta enviando correctamente la información");
-            const data = await this.useCase.execute(search);
-            res.status(200).json({ data });
+            const { uuid: userUUID } = this.service.getTokenData<{ uuid: string }>(token);
+
+            const teamUUID = req.params.teamUUID;
+            if (!teamUUID) {
+                throw new CustomError(400, "UUID del equipo es obligatorio.");
+            }
+
+            await this.useCase.execute(teamUUID, userUUID);
+
+            res.status(200).json({
+                message: "Equipo eliminado correctamente.",
+            });
         } catch (error: any) {
+            console.error("Error inesperado:", error);
             logger.error(error.message, {
                 metadata: {
                     route: req.originalUrl,
@@ -34,7 +48,9 @@ export class GetPlayersController {
                     stack: error.stack,
                 },
             });
-            res.status(error.statusCode || 500).json({ error: error.message || "Error interno del servidor" });
+            res.status(error.statusCode || 500).json({
+                error: error.message || "Error interno del servidor",
+            });
         }
-    }
+    };
 }

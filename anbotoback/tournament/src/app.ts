@@ -29,7 +29,9 @@ import { tournamentRouter } from "./tournamentManagment/infrastructure/routes/to
 
         app.use('/teams', teamRouter(
             dependencies.createTeamController, dependencies.inviteJoinTeamController,
-            dependencies.getMembersByTeamController
+            dependencies.getMembersByTeamController, dependencies.getIncompleteTeamsController,
+            dependencies.getAllTeamsController, dependencies.getTeamsInTournamentsController,
+            dependencies.deleteTeamController
         ));
 
         app.use('/tournaments', tournamentRouter(
@@ -60,3 +62,4 @@ import { tournamentRouter } from "./tournamentManagment/infrastructure/routes/to
         console.error("ERROR START APP:", error);
     }
 })();
+

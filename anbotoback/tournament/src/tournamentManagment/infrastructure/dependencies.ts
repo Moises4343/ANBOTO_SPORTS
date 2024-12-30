@@ -12,15 +12,19 @@ import { DeleteChatUseCase } from "../application/deleteChatUseCase";
 import { DeletePlayerTeamUseCase } from "../application/deletePlayerTeamUseCase";
 import { DeletePlayerUseCase } from "../application/deletePlayerUseCase";
 import { DeletePostUseCase } from "../application/deletePostUseCase";
+import { DeleteTeamUseCase } from "../application/deleteTeamUseCase";
 import { FinalizeTournamentUseCase } from "../application/finalizeTournamentUseCase";
 import { GenerateMatchesUseCase } from "../application/generedMatchesUseCase";
 import { GetAllPlayersUseCase } from "../application/getAllPlayersUseCase";
 import { GetAllPostsUseCase } from "../application/getAllPostsUseCase";
+import { GetAllTeamsUseCase } from "../application/getAllTeamsUseCase";
 import { GetChatsByUserIdUseCase } from "../application/getChatsByUserIdUseCase";
 import { GetDetailsTournamentUseCase } from "../application/getDetailsTournamentUseCase";
+import { GetIncompleteTeamsUseCase } from "../application/getIncompleteTeamsUseCase";
 import { GetMembersByTeamUseCase } from "../application/getMemberByTeamUseCase";
 import { GetPlayerByUUIDUseCase } from "../application/getPlayerByUUIDUseCase";
 import { GetPlayersUseCase } from "../application/getPlayersUseCase";
+import { GetTeamsInTournamentsUseCase } from "../application/getTeamsInTournamentsUseCase";
 import { GetTournamentsUseCase } from "../application/getTournamentsUseCase";
 import { GetUserPostsUseCase } from "../application/getUserPostsUseCase";
 import { InviteJoinTeamUseCase } from "../application/inviteJoinTeamUseCase";
@@ -35,6 +39,8 @@ import { ValidateCodeUseCase } from "../application/validateCodeUseCase";
 import { PlayerRepository } from "../domain/ports/playerRepository";
 import { TeamRepository } from "../domain/ports/teamRepository";
 import { TournamentRepository } from "../domain/ports/tournamentRepository";
+import { DeleteTeamController } from "../infrastructure/controllers/deleteTeamController";
+import { GetIncompleteTeamsController } from "../infrastructure/controllers/getIncompleteTeamsController";
 import { AcceptInvitationController } from "./controllers/acceptInvitationController";
 import { AdvanceRoundController } from "./controllers/advancedRoundController";
 import { CancelTournamentController } from "./controllers/cancelTournamentController";
@@ -47,10 +53,12 @@ import { DeletePlayerTeamController } from "./controllers/deletePlayerTeamContro
 import { FinalizeTournamentController } from "./controllers/finalizeTournamentController";
 import { GenerateMatchesController } from "./controllers/generatedMatchesController";
 import { GetAllPlayersController } from "./controllers/getAllPlayersController";
+import { GetAllTeamsController } from "./controllers/getAllTeamsController";
 import { GetDetailsTournamentController } from "./controllers/getDetailsTournamentController";
 import { GetMembersByTeamController } from "./controllers/getMembersByTeamController";
 import { GetPlayerByUUIDController } from "./controllers/getPlayerByUUIDController";
 import { GetPlayersController } from "./controllers/getPlayersController";
+import { GetTeamsInTournamentsController } from "./controllers/getTeamsInTournamentsController";
 import { GetTournamentsController } from "./controllers/getTournamentsController";
 import { InviteJointTeamController } from "./controllers/inviteJoinTeamController";
 import { LoginPlayerController } from "./controllers/loginPlayerController";
@@ -96,6 +104,12 @@ export const initializeDependencies = async () => {
     const registerMatchResultsUseCase: RegisterMatchResultsUseCase = new RegisterMatchResultsUseCase(tournamentRepository);
     const advanceRoundUseCase: AdvanceRoundUseCase = new AdvanceRoundUseCase(tournamentRepository);
     const finalizeTournamentUseCase: FinalizeTournamentUseCase = new FinalizeTournamentUseCase(tournamentRepository);
+    const getIncompleteTeamsUseCase: GetIncompleteTeamsUseCase = new GetIncompleteTeamsUseCase(teamRepository);
+    const getAllTeamsUseCase = new GetAllTeamsUseCase(teamRepository);
+    const getTeamsInTournamentsUseCase: GetTeamsInTournamentsUseCase = new GetTeamsInTournamentsUseCase(teamRepository);
+    const deleteTeamUseCase: DeleteTeamUseCase = new DeleteTeamUseCase(teamRepository);
+
+
 
 
     const createPlayerController: CreatePlayerController = new CreatePlayerController(createPlayerUseCase);
@@ -121,6 +135,10 @@ export const initializeDependencies = async () => {
     const getAllPlayersController = new GetAllPlayersController(getAllPlayersUseCase, tokenService);
     const deletePlayerUseCase = new DeletePlayerUseCase(playerRepository);
     const deletePlayerController = new DeletePlayerController(deletePlayerUseCase, tokenService);
+    const getIncompleteTeamsController: GetIncompleteTeamsController = new GetIncompleteTeamsController(getIncompleteTeamsUseCase, tokenService);
+    const getAllTeamsController: GetAllTeamsController = new GetAllTeamsController(getAllTeamsUseCase, tokenService);
+    const getTeamsInTournamentsController: GetTeamsInTournamentsController = new GetTeamsInTournamentsController(getTeamsInTournamentsUseCase, tokenService);
+    const deleteTeamController: DeleteTeamController = new DeleteTeamController(deleteTeamUseCase, tokenService);
 
     const chatRepository = new FirestoreChatRepository();
     const chatUseCases = new ChatUseCases(chatRepository);
@@ -152,6 +170,7 @@ export const initializeDependencies = async () => {
         advancedRoundController, finalizeTournamentController,
         chatController, getPlayerByUUIDController,
         postController, getAllPlayersController, 
-        deletePlayerController
+        deletePlayerController, getIncompleteTeamsController, getAllTeamsController,
+        getTeamsInTournamentsController, deleteTeamController
     };
 };

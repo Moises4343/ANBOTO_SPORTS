@@ -2,12 +2,13 @@ import { Request, RequestHandler, Response } from "express";
 import { GetAllPlayersUseCase } from "../../application/getAllPlayersUseCase";
 import { TokenService } from "../../application/tokenService";
 import { CustomError } from "../error/error";
+import logger from "../logs/logger";
 
 export class GetAllPlayersController {
   constructor(
     private useCase: GetAllPlayersUseCase,
     private service: TokenService
-  ) {}
+  ) { }
 
   execute: RequestHandler = async (req: Request, res: Response) => {
     try {
@@ -31,6 +32,18 @@ export class GetAllPlayersController {
       res.status(200).json({ data: users });
     } catch (error: any) {
       console.error("Error al obtener usuarios:", error);
+      logger.error(error.message, {
+        metadata: {
+          route: req.originalUrl,
+          method: req.method,
+          params: req.params,
+          body: req.body,
+          headers: req.headers,
+          ip: req.ip,
+          userAgent: req.headers["user-agent"] || "No disponible",
+          stack: error.stack,
+        },
+      });
       res.status(error.statusCode || 500).json({ error: error.message || "Error interno del servidor" });
     }
   };
