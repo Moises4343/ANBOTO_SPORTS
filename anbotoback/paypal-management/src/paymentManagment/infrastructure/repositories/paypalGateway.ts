@@ -47,6 +47,13 @@ export class PaypalGateway implements PaymentsGateway {
               },
             },
           ],
+          application_context: {
+            return_url: "http://localhost:3000/payments/capture-order",
+            cancel_url: "http://localhost:3000/payments/cancel", 
+            brand_name: "ANBOTO SPORTS", 
+            locale: "es-MX", 
+            user_action: "PAY_NOW", 
+          },
         }),
       });
       const { id, status, links } = response.data;
@@ -90,7 +97,7 @@ export class PaypalGateway implements PaymentsGateway {
           throw new HttpError("Identificador de orden invalida", 404);
         }
         if(status == 422 && data.issue == 'ORDER_NOT_APPROVED') {
-          throw new HttpError("Orden no aprovada", 422);
+          throw new HttpError("Orden no aprobada", 422);
         }
         const message = axiosError.response?.data || axiosError.message;
         throw new HttpError(`PayPal API Error: ${message}`, status);

@@ -1,6 +1,7 @@
 import { CaptureOrderUseCase } from "../application/captureOrderUseCase";
 import { CreateOrderUseCase } from "../application/createOrderUseCase";
 import { IsUserSuscribedUseCase } from "../application/isUserSuscribedUseCase";
+import { CancelPaymentController } from "./controllers/cancelPaymentController";
 import { CaptureOrderController } from "./controllers/captureOrderController";
 import { CreateOrderController } from "./controllers/createOrderController";
 import { IsUserSuscribedController } from "./controllers/isUserSuscribedController";
@@ -19,6 +20,7 @@ const paymentRepository = new PaymentMySQLRepository(orderRepository, suscrption
 const createOrderUseCase: CreateOrderUseCase = new CreateOrderUseCase(paypalGateway, paymentRepository);
 const captureOrderUseCase: CaptureOrderUseCase = new CaptureOrderUseCase(paypalGateway, paymentRepository);
 const isUserSuscribedUseCase: IsUserSuscribedUseCase = new IsUserSuscribedUseCase(paymentRepository);
+export const cancelPaymentController = new CancelPaymentController();
 
 export const createOrderController: CreateOrderController = new CreateOrderController(createOrderUseCase);
 export const captureOrderController: CaptureOrderController = new CaptureOrderController(captureOrderUseCase);
