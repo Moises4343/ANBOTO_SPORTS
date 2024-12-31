@@ -243,5 +243,13 @@ export class PlayerRepositoryImpl implements PlayerRepository {
         await PlayerModel.deleteOne({ uuid });
     }
 
+    async cleanPlayersTeamUUID(): Promise<void> {
+        const existingTeams = await TeamModel.distinct("uuid");
+        await PlayerModel.updateMany(
+            { teamUUID: { $nin: existingTeams } },
+            { $set: { teamUUID: null } }
+        );
+    }
+
 
 }

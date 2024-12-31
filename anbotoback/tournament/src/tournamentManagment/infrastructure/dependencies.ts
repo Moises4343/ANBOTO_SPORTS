@@ -4,6 +4,7 @@ import { AddLikeUseCase } from "../application/addLikeUseCase";
 import { AdvanceRoundUseCase } from "../application/advancedRoundUseCase";
 import { CancelTournamentUseCase } from "../application/cancelTournamentUseCase";
 import { ChatUseCases } from "../application/chatUseCases";
+import { CleanPlayersTeamUUIDUseCase } from "../application/cleanPlayersTeamUUIDUseCase";
 import { CreatePlayerUseCase } from "../application/createPlayerUseCase";
 import { CreatePostUseCase } from "../application/createPostUseCase";
 import { CreateTeamUseCase } from "../application/createTeamUseCase";
@@ -46,6 +47,7 @@ import { AcceptInvitationController } from "./controllers/acceptInvitationContro
 import { AdvanceRoundController } from "./controllers/advancedRoundController";
 import { CancelTournamentController } from "./controllers/cancelTournamentController";
 import { ChatController } from "./controllers/ChatController";
+import { CleanPlayersTeamUUIDController } from "./controllers/cleanPlayersTeamUUIDController";
 import { CreatePlayerController } from "./controllers/createPlayerController";
 import { CreateTeamController } from "./controllers/createTeamController";
 import { CreateTournamentController } from "./controllers/createTournamentController";
@@ -111,6 +113,7 @@ export const initializeDependencies = async () => {
     const getTeamsInTournamentsUseCase: GetTeamsInTournamentsUseCase = new GetTeamsInTournamentsUseCase(teamRepository);
     const deleteTeamUseCase: DeleteTeamUseCase = new DeleteTeamUseCase(teamRepository);
     const deleteTeamAdminUseCase: DeleteTeamAdminUseCase = new DeleteTeamAdminUseCase(teamRepository);
+    const cleanPlayersTeamUUIDUseCase: CleanPlayersTeamUUIDUseCase = new CleanPlayersTeamUUIDUseCase(playerRepository);
 
 
 
@@ -143,6 +146,7 @@ export const initializeDependencies = async () => {
     const getTeamsInTournamentsController: GetTeamsInTournamentsController = new GetTeamsInTournamentsController(getTeamsInTournamentsUseCase, tokenService);
     const deleteTeamController: DeleteTeamController = new DeleteTeamController(deleteTeamUseCase, tokenService);
     const deleteTeamAdminController: DeleteTeamAdminController = new DeleteTeamAdminController(deleteTeamAdminUseCase);
+    const cleanPlayersTeamUUIDController: CleanPlayersTeamUUIDController = new CleanPlayersTeamUUIDController(cleanPlayersTeamUUIDUseCase);
 
 
     const chatRepository = new FirestoreChatRepository();
@@ -176,6 +180,7 @@ export const initializeDependencies = async () => {
         chatController, getPlayerByUUIDController,
         postController, getAllPlayersController, 
         deletePlayerController, getIncompleteTeamsController, getAllTeamsController, 
-        getTeamsInTournamentsController, deleteTeamController, deleteTeamAdminController
+        getTeamsInTournamentsController, deleteTeamController, deleteTeamAdminController,
+        cleanPlayersTeamUUIDController
     };
 };

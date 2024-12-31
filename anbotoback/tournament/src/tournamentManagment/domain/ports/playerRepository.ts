@@ -12,4 +12,5 @@ export interface PlayerRepository {
     getByUUID(uuid: string): Promise<Player | null>;
     getAllPlayers(): Promise<Player[]>;
     deletePlayer(uuid: string): Promise<void>;
+    cleanPlayersTeamUUID(): Promise<void>;
 }
