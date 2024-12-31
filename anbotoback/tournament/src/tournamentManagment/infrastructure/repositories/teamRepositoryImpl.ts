@@ -98,6 +98,11 @@ export class TeamRepositoryImpl implements TeamRepository {
         if (!team) {
             throw new CustomError(404, "Equipo no encontrado.");
         }
+
+        await PlayerModel.updateMany(
+            { teamUUID: uuid },
+            { $set: { teamUUID: null } }
+        );        
     
         await TeamModel.deleteOne({ uuid });
     }
