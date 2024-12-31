@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { CreateTeamController } from "../controllers/createTeamController";
+import { DeleteTeamAdminController } from "../controllers/deleteTeamAdminController";
 import { DeleteTeamController } from "../controllers/deleteTeamController";
 import { GetAllTeamsController } from "../controllers/getAllTeamsController";
 import { GetIncompleteTeamsController } from "../controllers/getIncompleteTeamsController";
@@ -15,6 +16,8 @@ export const teamRouter = (
     getAllTeamsController: GetAllTeamsController,
     getTeamsInTournamentsController: GetTeamsInTournamentsController,
     deleteTeamController: DeleteTeamController,
+    deleteTeamAdminController: DeleteTeamAdminController,
+
 ): Router => {
     const router = Router();
 
@@ -26,6 +29,9 @@ export const teamRouter = (
     router.get("/in-tournaments", getTeamsInTournamentsController.execute.bind(getTeamsInTournamentsController));
     router.get("/incomplete", getIncompleteTeamsController.execute.bind(getIncompleteTeamsController));
     router.delete("/delete-team/:teamUUID", deleteTeamController.execute.bind(deleteTeamController));
+
+    router.delete('/admin/delete-team/:teamUUID', deleteTeamAdminController.execute.bind(deleteTeamAdminController));
+
     
     return router;
 };
