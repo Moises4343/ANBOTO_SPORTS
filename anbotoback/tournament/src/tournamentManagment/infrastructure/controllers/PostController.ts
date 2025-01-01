@@ -1,3 +1,4 @@
+import axios from "axios";
 import { Request, Response } from "express";
 import multer from "multer";
 import path from "path";
@@ -193,7 +194,7 @@ export class PostController {
     }
   }
 
-  async addComment(req: Request, res: Response): Promise<void> {
+  /*async addComment(req: Request, res: Response): Promise<void> {
     try {
       const authHeader = req.headers.authorization;
       if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -227,7 +228,59 @@ export class PostController {
       });
       res.status(error.statusCode || 500).json({ error: error.message });
     }
+  }*/
+
+    async addComment(req: Request, res: Response): Promise<void> {
+      try {
+          const authHeader = req.headers.authorization;
+          if (!authHeader || !authHeader.startsWith("Bearer ")) {
+              throw new CustomError(401, "Token no proporcionado o inválido.");
+          }
+  
+          const token = authHeader.split(" ")[1];
+          const { uuid } = this.tokenService.getTokenData<{ uuid: string }>(token);
+  
+          const { postId } = req.params;
+          const { content } = req.body;
+  
+          if (!content) {
+              throw new CustomError(400, "El comentario no puede estar vacío.");
+          }
+  
+          console.log("Enviando a FastAPI:", { content });
+  
+          const response = await axios.post("http://127.0.0.1:8000/filtro/posts", {
+              content: content,
+          });
+  
+          console.log("Respuesta de FastAPI:", response.data);
+  
+          if (!response.data || !response.data.content) {
+              throw new CustomError(400, "El comentario no pudo ser procesado correctamente.");
+          }
+  
+          const cleanedContent = response.data.content;
+          await this.addCommentUseCase.execute(postId, uuid, cleanedContent);
+  
+          res.status(201).json({ message: "Comentario agregado correctamente." });
+      } catch (error: any) {
+          console.error("Error al agregar comentario:", error);
+          logger.error(error.message, {
+              metadata: {
+                  route: req.originalUrl,
+                  method: req.method,
+                  params: req.params,
+                  body: req.body,
+                  headers: req.headers,
+                  ip: req.ip,
+                  userAgent: req.headers["user-agent"] || "No disponible",
+                  stack: error.stack,
+              },
+          });
+          res.status(error.statusCode || 500).json({ error: error.message });
+      }
   }
+    
 
   async addLike(req: Request, res: Response): Promise<void> {
     try {
