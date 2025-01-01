@@ -48,8 +48,8 @@ export class PaypalGateway implements PaymentsGateway {
             },
           ],
           application_context: {
-            return_url: "http://localhost:3000/payments/capture-order",
-            cancel_url: "http://localhost:3000/payments/cancel", 
+            return_url: "https://api.anbotosports.com/payments/capture-order",
+            cancel_url: "https://api.anbotosports.com/payments/cancel", 
             brand_name: "ANBOTO SPORTS", 
             locale: "es-MX", 
             user_action: "PAY_NOW", 
