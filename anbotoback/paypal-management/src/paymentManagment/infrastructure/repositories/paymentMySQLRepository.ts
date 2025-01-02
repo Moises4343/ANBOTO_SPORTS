@@ -2,6 +2,7 @@ import { Repository } from "typeorm";
 import { PaymentRepository } from "../../domain/ports/paymentRepository";
 import { Order } from "../database/models/Order";
 import { PremiumSubscription } from "../database/models/PremiumSuscription";
+import { HttpError } from "../errors/error";
 
 export class PaymentMySQLRepository implements PaymentRepository {
     constructor(private readonly repositoryOrder: Repository<Order>, private readonly repositorySuscription: Repository<PremiumSubscription>) {}
@@ -20,6 +21,16 @@ export class PaymentMySQLRepository implements PaymentRepository {
     async savePrmiumSucription(suscrption: { id: string, userId: string, orderId: string, transactionId: string, startDate: Date, endDate: Date }): Promise<void> {
         const suscription = this.repositorySuscription.create(suscrption);
         await this.repositorySuscription.save(suscription);
+    }
+
+    async deleteSubscriptionByUserId(userId: string): Promise<void> {
+        const subscription = await this.repositorySuscription.findOne({ where: { userId } });
+
+        if (!subscription) {
+            throw new HttpError("No existe una suscripción para este usuario.", 404);
+        }
+
+        await this.repositorySuscription.delete({ userId });
     }
 
 }
